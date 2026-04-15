@@ -19,7 +19,7 @@ export const getOfficeExits = async (req: Request, res: Response) => {
 };
 
 export const checkEpi = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string; // Correção principal para o TypeScript!
   const { epi_recorded } = req.body;
   const userId = (req as any).user.id;
   try {
