@@ -36,7 +36,7 @@ app.use(globalLimiter);
 const allowedOrigins = [
   'http://localhost:5173',        
   'http://localhost:3000',        
-  'col-brown.vercel.app' 
+  'https://col-brown.vercel.app' 
 ];
 
 const corsOptions = {
