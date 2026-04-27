@@ -25,8 +25,8 @@ export const login = async (req: Request, res: Response) => {
     // Mantemos a verificação de segurança (se a coluna não existir, ele ignora)
     if (user.is_active === false) return res.status(403).json({ error: 'Acesso bloqueado. Conta suspensa pelo administrador.' });
 
-    // ATENÇÃO: Mudou de user.encrypted_password para user.password para espelhar o Banco de Dados
-    const validPassword = await bcrypt.compare(password, user.password);
+    // ✅ CORREÇÃO 1: Lê 'encrypted_password' da base de dados em vez de 'password'
+    const validPassword = await bcrypt.compare(password, user.encrypted_password);
     if (!validPassword) return res.status(400).json({ error: 'Senha incorreta' });
 
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1d' });
@@ -44,7 +44,7 @@ export const login = async (req: Request, res: Response) => {
 
     const profile = profiles[0];
     
-    // ATENÇÃO: Lê as permissões diretamente da coluna JSONB do perfil (em vez da tabela inexistente)
+    // Lê as permissões diretamente da coluna JSONB do perfil (em vez da tabela inexistente)
     const userPermissions = profile.permissions || [];
     
     await createLog(user.id, 'LOGIN', { message: 'Login realizado' }, getClientIp(req));
@@ -71,9 +71,9 @@ export const register = async (req: Request, res: Response) => {
     const salt = await bcrypt.genSalt(10);
     const encryptedPassword = await bcrypt.hash(password, salt);
     
-    // ATENÇÃO: A inserção agora é feita na coluna 'password' correspondente ao banco
+    // ✅ CORREÇÃO 2: Inserção ajustada para a coluna 'encrypted_password' em vez de 'password'
     const userRes = await client.query(
-      'INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id',
+      'INSERT INTO users (email, encrypted_password) VALUES ($1, $2) RETURNING id',
       [email, encryptedPassword]
     );
     const newUserId = userRes.rows[0].id;
