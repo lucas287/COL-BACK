@@ -22,10 +22,10 @@ export const login = async (req: Request, res: Response) => {
 
     if (!user) return res.status(400).json({ error: 'Usuário não encontrado' });
     
-    // Mantemos a verificação de segurança (se a coluna não existir, ele ignora)
+    // Verificação de segurança (conta suspensa)
     if (user.is_active === false) return res.status(403).json({ error: 'Acesso bloqueado. Conta suspensa pelo administrador.' });
 
-    // ✅ CORREÇÃO 1: Lê 'encrypted_password' da base de dados em vez de 'password'
+    // ✅ CORREÇÃO NO LOGIN: Usamos 'user.encrypted_password' que vem do banco de dados
     const validPassword = await bcrypt.compare(password, user.encrypted_password);
     if (!validPassword) return res.status(400).json({ error: 'Senha incorreta' });
 
@@ -44,7 +44,7 @@ export const login = async (req: Request, res: Response) => {
 
     const profile = profiles[0];
     
-    // Lê as permissões diretamente da coluna JSONB do perfil (em vez da tabela inexistente)
+    // Lê as permissões da coluna JSONB do perfil
     const userPermissions = profile.permissions || [];
     
     await createLog(user.id, 'LOGIN', { message: 'Login realizado' }, getClientIp(req));
@@ -71,7 +71,7 @@ export const register = async (req: Request, res: Response) => {
     const salt = await bcrypt.genSalt(10);
     const encryptedPassword = await bcrypt.hash(password, salt);
     
-    // ✅ CORREÇÃO 2: Inserção ajustada para a coluna 'encrypted_password' em vez de 'password'
+    // ✅ CORREÇÃO NO REGISTRO: Alterado 'password' para 'encrypted_password' para bater com o banco
     const userRes = await client.query(
       'INSERT INTO users (email, encrypted_password) VALUES ($1, $2) RETURNING id',
       [email, encryptedPassword]
