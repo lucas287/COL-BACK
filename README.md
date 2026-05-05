@@ -1,6 +1,6 @@
-# ⚙️ COL - Backend API
+# ⚙️ CLO - Backend API
 
-Bem-vindo ao repositório do Backend do **Fluxo Royale**! 
+Bem-vindo ao repositório do Backend do **CLO**! 
 
 Esta é a API RESTful construída para alimentar o nosso sistema ERP (Enterprise Resource Planning). Desenvolvido por mim, estudante da **FATEC de Adamantina**, este projeto representa o núcleo lógico, de segurança e de processamento de dados para a gestão corporativa avançada.
 
